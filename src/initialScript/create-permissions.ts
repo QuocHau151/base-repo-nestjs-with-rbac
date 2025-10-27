@@ -1,7 +1,8 @@
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from 'src/app.module';
-import { HTTPMethod, RoleName } from 'src/common/constants/role.constant';
 import { PrismaService } from 'src/common/services/prisma.service';
+import { HTTPMethod } from 'src/constants/http-method.constant';
+import { RoleName } from 'src/constants/role.constant';
 
 const prisma = new PrismaService();
 

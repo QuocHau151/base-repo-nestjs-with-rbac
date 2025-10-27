@@ -1,7 +1,7 @@
-import { RoleName } from 'src/common/constants/role.constant';
+import envConfig from 'src/@configs/env';
 import { HashingService } from 'src/common/services/hasing.service';
 import { PrismaService } from 'src/common/services/prisma.service';
-import envConfig from 'src/configs/config';
+import { RoleName } from 'src/constants/role.constant';
 
 const prisma = new PrismaService();
 const hashingService = new HashingService();
@@ -38,7 +38,7 @@ const main = async () => {
       email: envConfig.ADMIN_EMAIL,
       password: hashedPassword,
       name: envConfig.ADMIN_NAME,
-      phoneNumber: envConfig.ADMIN_PHONE_NUMBER,
+      phone: envConfig.ADMIN_PHONE_NUMBER,
       roleId: adminRole.id,
     },
   });

@@ -1,15 +1,15 @@
 import { Injectable } from '@nestjs/common';
+import { PermissionType } from '../schemas/common-permission.schema';
+import { RoleType } from '../schemas/common-role.schema';
+import { UserType } from '../schemas/common-user.schema';
 import { PrismaService } from '../services/prisma.service';
-import { UserType } from '../models/common-user.model';
-import { RoleType } from '../models/common-role.model';
-import { PermissionType } from '../models/common-permission';
 
 type UserIncludeRolePermissionsType = UserType & {
   role: RoleType & { permissions: PermissionType[] };
 };
 
 export type WhereUniqueUserType =
-  | { id: number; deletedAt?: null }
+  | { id: string; deletedAt?: null }
   | { email: string; deletedAt?: null };
 
 @Injectable()
@@ -47,7 +47,7 @@ export class CommonUserRepository {
     });
   }
   update(
-    where: { id: number; deletedAt?: null },
+    where: { id: string; deletedAt?: null },
     data: Partial<UserType>,
   ): Promise<UserType | null> {
     return this.prismaService.user.update({

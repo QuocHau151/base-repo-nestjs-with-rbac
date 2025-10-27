@@ -1,33 +1,57 @@
-import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
+import { Global, Module } from '@nestjs/common';
 
-import { APP_FILTER, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
-import { CommonModule } from './common/common.module';
-import CustomZodValidationPipe from './common/pipes/custom-zod-validation.pipe';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR, APP_PIPE } from '@nestjs/core';
+import { JwtModule } from '@nestjs/jwt';
 import { ZodSerializerInterceptor } from 'nestjs-zod';
-import { HttpExceptionFilter } from './common/filters/http-exception.filter';
-import { AuthModule } from './routes/auth/auth.module';
-import { TransformInterceptor } from './common/interceptors/transform.interceptor';
-import { PermissionModule } from './routes/permission/permission.module';
-import { RoleModule } from './routes/role/role.module';
-import { LanguageModule } from './routes/language/language.module';
-import { ProfileModule } from './routes/profile/profile.module';
-import { UserModule } from './routes/user/user.module';
+import { HttpExceptionFilter } from './@system/filters/http-exception.filter';
+import { AccessTokenGuard } from './@system/guards/access-token.guard';
+import { APIKeyGuard } from './@system/guards/api-key.guard';
+import { AuthenticationGuard } from './@system/guards/authentication.guard';
+import { TransformInterceptor } from './@system/interceptors/transform.interceptor';
+import CustomZodValidationPipe from './@system/pipes/custom-zod-validation.pipe';
+import { CommonRoleRepository } from './common/repositories/common-role.repo';
+import { CommonUserRepository } from './common/repositories/common-user.repo';
+import { TwoFactorService } from './common/services/2fa.service';
+import { EmailService } from './common/services/email.service';
+import { HashingService } from './common/services/hasing.service';
+import { PrismaService } from './common/services/prisma.service';
+import { TokenService } from './common/services/token.service';
+import { AuthModule } from './modules/auth/auth.module';
+import { PermissionModule } from './modules/permission/permission.module';
+import { ProfileModule } from './modules/profile/profile.module';
+import { RoleModule } from './modules/role/role.module';
+import { UserModule } from './modules/user/user.module';
 
+// Các service dùng chung trong toàn bộ ứng dụng
+const commonServices = [
+  PrismaService,
+  HashingService,
+  TokenService,
+  CommonUserRepository,
+  CommonRoleRepository,
+  EmailService,
+  TwoFactorService,
+];
+
+@Global()
 @Module({
   imports: [
-    CommonModule,
+    JwtModule,
     AuthModule,
     PermissionModule,
     RoleModule,
-    LanguageModule,
     ProfileModule,
     UserModule,
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
-    AppService,
+    ...commonServices,
+    AccessTokenGuard,
+    APIKeyGuard,
+    {
+      provide: APP_GUARD,
+      useClass: AuthenticationGuard,
+    },
     {
       provide: APP_PIPE,
       useClass: CustomZodValidationPipe,
@@ -39,5 +63,6 @@ import { UserModule } from './routes/user/user.module';
       useClass: HttpExceptionFilter,
     },
   ],
+  exports: commonServices,
 })
 export class AppModule {}

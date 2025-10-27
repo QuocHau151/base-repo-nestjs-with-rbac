@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { RoleType } from '../models/common-role.model';
+import { RoleName } from '../../constants/role.constant';
+import { RoleType } from '../schemas/common-role.schema';
 import { PrismaService } from '../services/prisma.service';
-import { RoleName } from '../constants/role.constant';
 
 @Injectable()
 export class CommonRoleRepository {
-  private clientRoleId: number | null = null;
-  private adminRoleId: number | null = null;
+  private clientRoleId: string | null = null;
+  private adminRoleId: string | null = null;
 
   constructor(private readonly prismaService: PrismaService) {}
 
